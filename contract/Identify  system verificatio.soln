@@ -1,1 +1,41 @@
 
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+contract Project {
+    string public systemName;
+    address public owner;
+
+    event VerificationStatusUpdated(bool newStatus);
+    event SystemNameUpdated(string newName);
+
+    bool public isVerified;
+
+    constructor(string memory _systemName) {
+        systemName = _systemName;
+        owner = msg.sender;
+        isVerified = false;
+    }
+
+    // Update the system name — restricted to owner
+    function updateSystemName(string calldata _newName) external onlyOwner {
+        systemName = _newName;
+        emit SystemNameUpdated(_newName);
+    }
+
+    // Toggle verification status
+    function toggleVerification() external onlyOwner {
+        isVerified = !isVerified;
+        emit VerificationStatusUpdated(isVerified);
+    }
+
+    // Retrieve system info
+    function getSystemInfo() external view returns (string memory, bool, address) {
+        return (systemName, isVerified, owner);
+    }
+
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Not authorized");
+        _;
+    }
+}
